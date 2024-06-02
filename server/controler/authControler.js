@@ -14,7 +14,7 @@ const signInToken = (id)=>{
 exports.signUp = async(req,res)=>{
     try{
         const { name, email} = req.body;
-        const parsedDate = moment(req.body.passwordChangeAt, "DD-MM-YYYY").toDate();
+        //const parsedDate = moment(req.body.passwordChangeAt, "DD-MM-YYYY").toDate();
         const newUser  = await User.create({
             name:req.body.name,
             email:req.body.email,
@@ -22,7 +22,7 @@ exports.signUp = async(req,res)=>{
             passwordConfirm:req.body.passwordConfirm,
             lastname:req.body.lastname,
             location:req.body.location,
-            passwordChangeAt:parsedDate,
+            //passwordChangeAt:parsedDate,
         })
         sendMail(email,"Wellcome to our Jobtrack App",`Hi ${name}, thank you for registering. We hope you enjoy our services!`)
         const token = signInToken(newUser._id)
@@ -106,8 +106,8 @@ exports.protect = async(req, res, next)=>{
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         token = req.headers.authorization.split(' ')[1];
     }
+    //console.log(token)
     if (!token) {
-        
         return res.status(401).json({
             status: 'Failed',
             message: 'You are not logged in! Please log in to get access.',
@@ -116,8 +116,10 @@ exports.protect = async(req, res, next)=>{
     //2 verifaction the token
     try{
         const decode = await promisify(jwt.verify)(token, process.env.JWT_TOkEN_KEY)
+        //console.log(decode)
         // 3 check user Still Exist
         const fresUser = await User.findById(decode.id)
+        //console.log(fresUser)
         if(!fresUser){
             return res.status(401).json({
                 status: 'Failed',
@@ -131,9 +133,10 @@ exports.protect = async(req, res, next)=>{
         }
         //4 Granted Access to the routes
         req.user = fresUser;
-        res.locals.user = currentUser;
+        res.locals.user = fresUser;
         next();
     }catch(error){
+        console.log(error)
         let message = 'Invalid token! Please log in again to get access.';
         
         if (error.name === 'TokenExpiredError') {
@@ -143,6 +146,27 @@ exports.protect = async(req, res, next)=>{
             status: 'Failed',
             message,
         });
+    }
+}
+// get Current user 
+exports.getCurrentUser = async(req,res)=>{
+    try{
+        const currentUser = await User.findOne({_id:req.user.id})
+        if(!currentUser){
+            return res.status(200).json({
+                status:"seccues",
+                data:{
+                    currentUser,
+                    location : currentUser.location
+                }
+            })
+        }
+    }catch(error){
+        console.log(error)
+        res.status(500).json({
+            status:"Crruent User not get",
+            message:"Server Error"
+        })
     }
 }
 // Now Create Restricted Role
@@ -156,4 +180,12 @@ exports.restrictTo = (role)=>{
         }
     next();
     }
+}
+//logout funcation 
+exports.logout = async(req,res)=>{
+    res.cookie('jwt', 'logout',{
+        expiresIn: new Date(Date.now() +10 *1000),
+        httpOnly:true
+    })
+    res.status(200).json({ status: 'success' });    
 }

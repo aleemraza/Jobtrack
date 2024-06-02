@@ -6,6 +6,7 @@ const routes = express.Router()
 //authControler Routes for New User Signup and login
 routes.post('/sigup', authControler.signUp);
 routes.post('/login', authControler.login);
+routes.get('/logout', authControler.logout);
 
 
 routes.get('/', authControler.protect, userControler.show)
