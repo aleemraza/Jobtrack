@@ -2,6 +2,9 @@ import react , {createContext, useContext, useState} from 'react'
 const ApiContext = createContext();
 export const ApiProvider = ({ children })=>{
     const YOUR_PERSONAL_TOKEN = 'malikaleemraza';
+
+    //Auth Check State
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
     // 1)User Register Api
     const RegisterApi = async(register)=>{
         const {name,email,password,passwordConfirm,lastname,location} = register;
@@ -57,6 +60,7 @@ export const ApiProvider = ({ children })=>{
             if(res.ok){
                 const { token } = res_data;
                 localStorage.setItem('token', token);
+                setIsAuthenticated(true)
                 console.log('login successfully !')
                 return { success: true};
             }else{
@@ -80,6 +84,7 @@ export const ApiProvider = ({ children })=>{
             })
             if(res.ok){
                 localStorage.removeItem('token')
+                setIsAuthenticated(false)
                 return {success:true};
             }else{
                 console.error('Failed to logout:', res);
@@ -93,7 +98,7 @@ export const ApiProvider = ({ children })=>{
     }
 
     return (
-        <ApiContext.Provider value={{RegisterApi, LoginApi, LogoutAPI}}>
+        <ApiContext.Provider value={{isAuthenticated,RegisterApi,LoginApi, LogoutAPI}}>
             {children}
         </ApiContext.Provider>
     )

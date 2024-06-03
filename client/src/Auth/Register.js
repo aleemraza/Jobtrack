@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import {Link,useNavigate} from 'react-router-dom'
 import {ToastContainer , toast} from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import {useData} from '../API/ApiContext'
 const ResgisterValue = {
   name:'',
@@ -22,12 +23,18 @@ const Register = () => {
     e.preventDefault()
     const result = await RegisterApi(register);
     if (result.success) {
-        alert('User registered successfully');
+      toast.success("User registered successfully",{
+        position:'top-center'
+      })
+      //alert('User registered successfully');
         setTimeout(()=>{
           Navigate('/login')
         },2000)
     } else {
-        alert('Signup failed: ' + result.error);
+      toast.error("Already have an account",{
+        position:"top-center"
+      })
+      console.log('Signup failed: ' + result.error);
     }
   }
   return (
@@ -90,6 +97,7 @@ const Register = () => {
 						</div>
     </form>
   </div>
+  <ToastContainer/>
  </div>
     </>
   )

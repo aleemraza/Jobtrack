@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import {Link,useNavigate} from 'react-router-dom'
 import {useData} from '../API/ApiContext'
+import {ToastContainer , toast} from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 const SetLoginValue = {
   email:'',
   password:''
@@ -22,12 +24,18 @@ const Login = () => {
     e.preventDefault()
     const results = await LoginApi(login)
     if(results.success){
-      alert('User Login successfully');
+      toast.success("User Login successfully",{
+        position:"top-center"
+      })
+      //alert('User Login successfully');
       setTimeout(()=>{
         navigate('/dashboard')
       },2000)
     }else{
-      alert('Signup failed: ' + results.error);
+      toast.error("Email or password are Wrong Please Try Again",{
+        position:"top-center"
+      })
+      console.log('Login Failed failed: ' + results.error);
     }
   }
 
@@ -67,6 +75,7 @@ const Login = () => {
 			</div>
     </form>
   </div>
+  <ToastContainer/>
  </div>
    </>
   )

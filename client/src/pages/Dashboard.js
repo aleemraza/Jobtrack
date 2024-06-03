@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react'
 import {useData} from '../API/ApiContext'
 import {useNavigate} from 'react-router-dom'
+import {ToastContainer , toast} from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 const Dashboard = () => {
   const {LogoutAPI} = useData()
   const navigate = useNavigate()
@@ -8,10 +10,17 @@ const Dashboard = () => {
   const Logout = async () => {
     const res = await LogoutAPI();
     if (res.success) {
-        alert('User logged out successfully');
+      toast.success("User logged out successfully",{
+        position:"top-center"
+      });
+      setTimeout(()=>{
         navigate('/')
+      },2000)
     } else {
-        alert('Logout failed: ' + res.error || res.message);
+      toast.error("Logout failed",{
+        position:"top-center"
+      })
+        console.log('Logout failed: ' + res.error || res.message);
     }
 };
   return (
@@ -23,6 +32,7 @@ const Dashboard = () => {
             >
                 Logout
             </button>
+    <ToastContainer/>        
     </>
   )
 }
