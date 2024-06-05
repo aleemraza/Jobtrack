@@ -29,7 +29,7 @@ const Login = () => {
       })
       //alert('User Login successfully');
       setTimeout(()=>{
-        navigate('/dashboard')
+        navigate('/adminhome')
       },2000)
     }else{
       toast.error("Email or password are Wrong Please Try Again",{

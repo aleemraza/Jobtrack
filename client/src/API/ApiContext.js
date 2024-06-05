@@ -1,10 +1,16 @@
-import react , {createContext, useContext, useState} from 'react'
+import react , {createContext, useContext, useEffect, useState} from 'react'
 const ApiContext = createContext();
 export const ApiProvider = ({ children })=>{
     const YOUR_PERSONAL_TOKEN = 'malikaleemraza';
 
     //Auth Check State
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(()=>{
+        return !! localStorage.getItem('token')
+    })
+
+    useEffect(()=>{
+        setIsAuthenticated(!!localStorage.getItem('token'));
+    })
     // 1)User Register Api
     const RegisterApi = async(register)=>{
         const {name,email,password,passwordConfirm,lastname,location} = register;
@@ -59,8 +65,8 @@ export const ApiProvider = ({ children })=>{
             const res_data = await res.json();
             if(res.ok){
                 const { token } = res_data;
-                localStorage.setItem('token', token);
                 setIsAuthenticated(true)
+                localStorage.setItem('token', token);
                 console.log('login successfully !')
                 return { success: true};
             }else{
@@ -83,8 +89,8 @@ export const ApiProvider = ({ children })=>{
                 }
             })
             if(res.ok){
-                localStorage.removeItem('token')
                 setIsAuthenticated(false)
+                localStorage.removeItem('token')
                 return {success:true};
             }else{
                 console.error('Failed to logout:', res);
