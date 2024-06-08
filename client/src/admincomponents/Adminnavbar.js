@@ -19,7 +19,7 @@ const Adminnavbar = () => {
     };
   return (
     <>
-    <nav class="block w-full max-w-full bg-transparent text-white shadow-none rounded-xl transition-all px-0 py-1">
+    <nav class="block w-full  max-w-full bg-transparent text-white shadow-none rounded-xl transition-all px-0 py-1">
       <div class="flex flex-col-reverse justify-between gap-6 md:flex-row md:items-center">
         <div class="capitalize">
           <nav aria-label="breadcrumb" class="w-max">

@@ -3,6 +3,7 @@ const User = require('../Model/userModel');
 //Create A job 
 exports.createJob = async(req,res)=>{
     try{
+    console.log(req.body) 
     const {company,position} = req.body;
     if(!company || !position){
         res.status(404).json({

@@ -1,13 +1,13 @@
 import react , {createContext, useContext, useEffect, useState} from 'react'
+import {jwtDecode} from 'jwt-decode'
 const ApiContext = createContext();
+const token = localStorage.getItem('token')
 export const ApiProvider = ({ children })=>{
     const YOUR_PERSONAL_TOKEN = 'malikaleemraza';
-
     //Auth Check State
     const [isAuthenticated, setIsAuthenticated] = useState(()=>{
         return !! localStorage.getItem('token')
     })
-
     useEffect(()=>{
         setIsAuthenticated(!!localStorage.getItem('token'));
     })
@@ -102,9 +102,83 @@ export const ApiProvider = ({ children })=>{
         }
 
     }
+    // add Job API
+    const addJobAPI = async(addJob)=>{
+       // const token = localStorage.getItem('token');
+
+        if (!token) {
+            console.log("Token not found");
+            return { success: false, error: "Token not found" };
+        }
+        let user;
+        try {
+            const decode = jwtDecode(token);
+            user = decode.id;
+        } catch (err) {
+            console.log("Invalid token");
+            return { success: false, error: "Invalid token" };
+        }
+        if (!user) {
+            console.log("User is invalid");
+            return { success: false, error: "User is invalid" };
+        }
+        const {company,position,status,jobType,jobLocation} = addJob;
+        try {
+            const res = await fetch('http://127.0.0.1:8080/api/v1/jobs', {
+                method: "POST",
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json' // Added Content-Type header
+                },
+                body: JSON.stringify({
+                    company: company,
+                    position: position,
+                    status: status,
+                    jobType: jobType,
+                    jobLocation: jobLocation,
+                    createdBy: user
+                })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                console.log("Job added successfully");
+                return { success: true, message: "Job added successfully" };
+            } else {
+                console.log("Failed to add job", data.error);
+                return { success: false, error: data.error || "Failed to add job" };
+            }
+        } catch (error) {
+            console.log("Error", error);
+            return { success: false, error: error.message || "An error occurred" };
+        }
+    }
+    //getAll Jobs
+    const getAllJobsAPI = async(queryParams)=>{
+        try{
+            const res = await fetch(`http://127.0.0.1:8080/api/v1/jobs?${queryParams.toString()}`,{
+                method:"GET",
+                headers:{
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+            });
+            if(res.ok){
+                const res_data = await res.json();
+                console.log("All jobs get")
+                return {success:true, data:res_data};
+            }else{
+                console.error("Jobs are not get")
+                return {success:false ,message:"failed to get jobs"}
+            }
+        }catch(eror){
+            console.error("Error", eror)
+            return {success:false, error:eror.message || "An Error Occurred"}
+        }
+
+    }
 
     return (
-        <ApiContext.Provider value={{isAuthenticated,RegisterApi,LoginApi, LogoutAPI}}>
+        <ApiContext.Provider value={{isAuthenticated,RegisterApi,LoginApi, LogoutAPI, addJobAPI, getAllJobsAPI}}>
             {children}
         </ApiContext.Provider>
     )
