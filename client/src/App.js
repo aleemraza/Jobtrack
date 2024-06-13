@@ -8,6 +8,7 @@ import Register from './Auth/Register';
 import AdminHome from './pages/adminpages/AdminHome'
 import Addjob from './pages/adminpages/Addjob'
 import Alljobs from './pages/adminpages/Alljobs';
+import EditJob from './pages/adminpages/EditJob';
 function App() {
 
   return (
@@ -20,7 +21,7 @@ function App() {
     <Route  path='/adminhome' element={<ProtectedRoute><AdminHome/></ProtectedRoute>}/>
     <Route  path='/addjob' element={<ProtectedRoute><Addjob/></ProtectedRoute>}/>
     <Route  path='/alljob' element={<ProtectedRoute><Alljobs/></ProtectedRoute>}/>
-   
+    <Route  path='/editjob/:id' element={<ProtectedRoute><EditJob/></ProtectedRoute>}/>
     </Routes>
     </BrowserRouter>
    </>

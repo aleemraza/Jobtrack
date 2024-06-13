@@ -9,6 +9,6 @@ routes.post('/login', authControler.login);
 routes.get('/logout', authControler.logout);
 
 
-routes.get('/', authControler.protect, userControler.show)
+//routes.get('/', authControler.protect, userControler.show)
 
 module.exports = routes

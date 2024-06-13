@@ -174,11 +174,108 @@ export const ApiProvider = ({ children })=>{
             console.error("Error", eror)
             return {success:false, error:eror.message || "An Error Occurred"}
         }
+    }
+    //Edit Job API
+    const editJobAPI = async(id, editJob)=>{
+        const {company,position,status,jobType,jobLocation} = editJob;
+        try{
+            const res = await fetch(`http://127.0.0.1:8080/api/v1/jobs/${id}`,{
+                method:"PATCH",
+                headers:{
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body:JSON.stringify({
+                    company: company,
+                    position: position,
+                    status: status,
+                    jobType: jobType,
+                    jobLocation: jobLocation,
+                })
+            })
+            if(res.ok){
+                const res_data = await res.json();
+                return {success:true , data:res_data}
+
+            }else{
+                return {success:false , message:"Failed to edit"}
+            }
+        }catch(error){
+            return {success:false , error}
+        }
+    }
+    // getOneAPI
+    const getOneJobAPI = async(id)=>{
+        try{
+            const res = await fetch(`http://127.0.0.1:8080/api/v1/jobs/${id}`,{
+                method:"GET",
+                headers:{
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+            });
+            if(res.ok){
+                const res_data = await res.json();
+                console.log("jobs get")
+                return {success:true, data:res_data};
+            }else{
+                console.error("Jobs are not get")
+                return {success:false ,message:"failed to get jobs"}
+            }
+        }catch(eror){
+            console.error("Error", eror)
+            return {success:false, error:eror.message || "An Error Occurred"}
+        }
+    }
+    //Show State API
+    const StateJobAPI = async()=>{
+        try{
+            const res = await fetch(`http://127.0.0.1:8080/api/v1/jobs/stats`,{
+                method:"GET",
+                headers:{
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            if(res.ok){
+                const res_data = await res.json();
+                return {success:true, message:"Job State are  get Sucessfully",data:res_data}
+            }else{
+                console.error("Error")
+                return {success:false, message:"Failed To State"}
+            }
+        }catch(error){
+            console.error("Error", error)
+            return {success:false , error:error.message || "An Error Is Accoured"}
+        }
+    } 
+    //Delete Job
+    const deleteJobAPI = async(id)=>{
+        try{
+            const res = await fetch(`http://127.0.0.1:8080/api/v1/jobs/${id}`,{
+                method:"DELETE",
+                headers:{
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            if(res.ok){
+                return {success:true, message:"Job are Delete"}
+            }else{
+                console.error("Jobs Are Delete")
+                return {success:false, message:"Failed To Delete a job"}
+            }
+            
+
+        }catch(error){
+            console.error("Error", error)
+            return {success:false , error:error.message || "An Error Is Accoured"}
+        }
 
     }
-
     return (
-        <ApiContext.Provider value={{isAuthenticated,RegisterApi,LoginApi, LogoutAPI, addJobAPI, getAllJobsAPI}}>
+        <ApiContext.Provider value={{isAuthenticated,RegisterApi,LoginApi, LogoutAPI, addJobAPI, 
+        getAllJobsAPI, deleteJobAPI , editJobAPI , getOneJobAPI ,StateJobAPI}}>
             {children}
         </ApiContext.Provider>
     )

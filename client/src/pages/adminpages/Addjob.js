@@ -1,6 +1,7 @@
 import React,{useState} from 'react'
 import AdminLayouts from '../../admincomponents/AdminLayouts'
 import {useData} from '../../API/ApiContext'
+import {useNavigate} from 'react-router-dom'
 import {ToastContainer , toast} from 'react-toastify'
 const addJobValue ={
   company:'',
@@ -11,6 +12,7 @@ const addJobValue ={
 }
 const Addjob = () => {
   const [addJob, setaddJob] = useState(addJobValue);
+  const Navigate = useNavigate()
   const {addJobAPI} = useData()
 
   const getAddJobValue = (e)=>{
@@ -21,9 +23,12 @@ const Addjob = () => {
     e.preventDefault()
     const res = await addJobAPI(addJob);
     if(res.success){
-      toast.success("Job Add Sucessssfully",{
-        position:"top-center"
-      })
+      setTimeout(()=>{
+        toast.success("Job Add Sucessssfully",{
+          position:"top-center"
+        })
+      },1000)
+      Navigate('/alljob')
     }else{
       toast.error("Failed To add Job",{
         position:"top-center"
@@ -31,10 +36,6 @@ const Addjob = () => {
       console.log("Failed to Add Job", + res.error)
     }
   }
-
-console.log(addJob)
-
-
   return (
 <AdminLayouts>
 <div className="bg-white  rounded-lg shadow relative m-10">

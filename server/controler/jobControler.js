@@ -1,5 +1,7 @@
+const { default: mongoose } = require('mongoose');
 const Job = require('../Model/jobModel');
 const User = require('../Model/userModel');
+const moment = require('moment');
 //Create A job 
 exports.createJob = async(req,res)=>{
     try{
@@ -83,9 +85,7 @@ exports.getAllJob = async(req,res)=>{
 exports.updateJob = async(req,res)=>{
   try{
     const {id:jobId} = req.params;
-    // console.log(jobId)
-    const {company,position} = req.body
-    // console.log(company)
+    const {company,position} = req.body; 
     if(!company || !position){
       return res.status(404).json({
         status:"Failed",
@@ -130,26 +130,135 @@ exports.updateJob = async(req,res)=>{
         });
   }
 }
-exports.deleteJob = async(req,res)=>{
-  const {id:jobId} = req.params;
-  const job = await Job.findOne({_id:jobId})
-  if(!job){
-    return res.status(403).json({
+//getjobs 
+exports.getJob = async(req,res)=>{
+  try{
+    const {id:jobID} = req.params;
+    const  findjob = await Job.findOne({_id:jobID})
+    if(!findjob){
+      return res.status(404).json({
+        status: "Failed",
+        message: "No job data found"
+        });
+        }
+    if(req.user._id.toString() === findjob.createdBy.toString()){
+      const data = await Job.findById({_id:jobID})
+      res.status(200).json({
+        status:'seccuess',
+        data:{
+            data
+        }
+      });
+    }else{
+      return res.status(403).json({
+        status: "Failed",
+        message: "Not authorized to Update this job"
+      });
+    }
+  }catch(error){  
+    res.status(500).json({
       status:"Failed",
-      message:"No job Data Found"
+      message:"An error occurred while deleting the job" + error
+    })
+  }
+}
+exports.deleteJob = async (req, res) => {
+  try {
+    // Extract jobId from req.params
+    const { id: jobId } = req.params;
+    // Find the job by ID
+    const job = await Job.findOne({ _id: jobId });
+    // Check if job exists
+    if (!job) {
+      return res.status(404).json({
+        status: "Failed",
+        message: "No job data found"
+      });
+    }
+    // Check permissions
+    if (req.user._id.toString() !== job.createdBy.toString()) {
+      return res.status(403).json({
+        status: "Failed",
+        message: "Not authorized to delete this job"
+      });
+    }
+    // Remove the job
+    await Job.deleteOne({ _id: jobId });
+    // Respond with success message
+    res.status(200).json({
+      status: 'Success',
+      message: 'Job removed successfully'
+    });
+  } catch (error) {
+    // Log the error
+    console.error(error);
+    // Respond with an error message
+    res.status(500).json({
+      status: 'Failed',
+      message: 'An error occurred while deleting the job'
     });
   }
-  //Check Permssion 
-  if(req.user._id.toString() === job.createdBy.toString()){
-     await job.remove();
-     res.status(200).json({
-      status:'seccuess',
-      message:"Success! Job removed"
-    });
-  }else{
-    res.status(404).json({
-      status:"Failed",
-      message:"Not authorized to access this route"
+};
+
+//Show Stats of the 
+exports.ShowStatus = async(req,res)=>{
+  try{
+    // Convert user ID to a Mongoose ObjectId
+    const userId = new mongoose.Types.ObjectId(req.user._id.toString());
+    // Perform the aggregation
+    let state = await Job.aggregate([
+      { $match: { createdBy: userId } },
+      { $group: { _id: '$status', count: { $sum: 1 } } }
+    ]);
+    // Transform the state array into an object
+    state = state.reduce((acc, curr) => {
+      const { _id: title, count } = curr;
+      acc[title] = count;
+      return acc;
+    }, {});
+
+    const defaultStats = {
+      pending: state.pending || 0,
+      interview: state.interview || 0,
+      declined: state.declined || 0,
+    };
+    // console.log(state)
+    // console.log(defaultStats)
+    let monthlyApplications  = await Job.aggregate([
+      {$match:{createdBy:userId}},
+      {
+        $group:{
+          _id:{year:{$year:'$createdAt'}, month:{$month:"$createdAt"} },
+          count :{$sum:1},
+        },
+        
+      },
+        {$sort:{'_id.year': -1, '_id.month':-1}},
+        {$limit:6}
+        ])
+    monthlyApplications = monthlyApplications
+    .map((item) => {
+      const { _id: { year, month }, count } = item;
+      const date = moment()
+      .month(month - 1)
+      .year(year)
+      .format('MMM Y');
+    return { date, count };
+  }).reverse();
+  console.log(monthlyApplications)
+    res.status(200).json({
+      status:"sucess", 
+      message:"Sucessfully!",
+      data:{
+        defaultStats,
+        monthlyApplications
+      }
+  })
+  }catch(error){
+    console.error(error);
+    res.status(500).json({
+      status: 'Failed',
+      message: 'An error occurred'
     });
   }
 }
