@@ -149,26 +149,32 @@ exports.protect = async(req, res, next)=>{
     }
 }
 // get Current user 
-exports.getCurrentUser = async(req,res)=>{
-    try{
-        const currentUser = await User.findOne({_id:req.user.id})
-        if(!currentUser){
-            return res.status(200).json({
-                status:"seccues",
-                data:{
+exports.getCurrentUser = async (req, res) => {
+    try {
+        const currentUser = await User.findOne({ _id: req.user.id });
+        console.log(currentUser);
+        if (currentUser) {
+            res.status(200).json({
+                status: "success",
+                data: {
                     currentUser,
-                    location : currentUser.location
+                    location: currentUser.location
                 }
-            })
+            });
+        } else {
+            res.status(404).json({
+                status: "Current user not found",
+                message: "User not found"
+            });
         }
-    }catch(error){
-        console.log(error)
+    } catch (error) {
+        console.error(error);
         res.status(500).json({
-            status:"Crruent User not get",
-            message:"Server Error"
-        })
+            status: "Current user not retrieved",
+            message: "Server error"
+        });
     }
-}
+};
 // Now Create Restricted Role
 exports.restrictTo = (role)=>{
     return (req,res,next)=>{

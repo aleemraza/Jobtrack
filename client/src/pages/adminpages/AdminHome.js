@@ -6,8 +6,7 @@ const AdminHome = () => {
   const {StateJobAPI} = useData()
   const [defaultStats, setdefaultStats] = useState([])
   const [monthlyApplications, setmonthlyApplications] = useState([])
-  // const [Interviews, setInterviews] = useState()
-  // const [Declined, setDeclined] = useState()
+
   const getstatejob = async()=>{
     const res = await StateJobAPI()
     if(res.success){
@@ -19,8 +18,10 @@ const AdminHome = () => {
       console.error(res.message || res.error);
     }
   }
+
   useEffect(()=>{
     getstatejob()
+    
   },[])
   return (
    <AdminLayouts>

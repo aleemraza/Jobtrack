@@ -271,11 +271,36 @@ export const ApiProvider = ({ children })=>{
             console.error("Error", error)
             return {success:false , error:error.message || "An Error Is Accoured"}
         }
+    }
 
+    const CurrentUser = async()=>{
+        try{
+            const res = await fetch('http://127.0.0.1:8080/api/v1/user/currentUser',{
+                method:"GET",
+                headers:{
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            if(res.ok){
+                const res_data = await res.json()
+                return {success:true, message:"User get Sucessfully", data:res_data}
+            }else{
+                console.error("Error")
+                return {success:false, message:"Failed Get Current User"}
+            }
+        }catch(error){
+            console.error("Error",error)
+            return {success:false , error:error.message || "An Error Is Accoured"}
+        }
+    }
+
+    const updateUser = async()=>{
+        
     }
     return (
         <ApiContext.Provider value={{isAuthenticated,RegisterApi,LoginApi, LogoutAPI, addJobAPI, 
-        getAllJobsAPI, deleteJobAPI , editJobAPI , getOneJobAPI ,StateJobAPI}}>
+        getAllJobsAPI, deleteJobAPI , editJobAPI , getOneJobAPI ,StateJobAPI, CurrentUser}}>
             {children}
         </ApiContext.Provider>
     )
