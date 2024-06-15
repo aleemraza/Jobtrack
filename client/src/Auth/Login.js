@@ -19,9 +19,23 @@ const Login = () => {
     setLogin({...login, [e.target.name]:e.target.value})
   }
 
+  const isFormValid = () => {
+    const {email, password} = login;
+    if ( !email || !password) {
+      return false;
+    }
+    return true;
+  };
+
   //Submit Login Deatils 
   const SubmtLogin = async(e)=>{
     e.preventDefault()
+    if (!isFormValid()) {
+      toast.error("All fields are required", {
+        position: 'top-center',
+      });
+      return;
+    }
     const results = await LoginApi(login)
     if(results.success){
       toast.success("User Login successfully",{
@@ -43,10 +57,11 @@ const Login = () => {
    <>
 <div className="bg-gray-200 dark:bg-gray-800 h-screen overflow-hidden flex items-center justify-center">
   <div className="bg-white lg:w-6/12 md:7/12 w-8/12 shadow-3xl rounded-xl">
-    <div className="bg-gray-800 shadow shadow-gray-200 absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full p-4 md:p-8">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="#FFF">
-        <path d="M0 3v18h24v-18h-24zm6.623 7.929l-4.623 5.712v-9.458l4.623 3.746zm-4.141-5.929h19.035l-9.517 7.713-9.518-7.713zm5.694 7.188l3.824 3.099 3.83-3.104 5.612 6.817h-18.779l5.513-6.812zm9.208-1.264l4.616-3.741v9.348l-4.616-5.607z"/>
-      </svg>
+    <div className="bg-white shadow shadow-gray-200 absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full p-4 md:p-8">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+</svg>
+
     </div>
     <form className="p-12 md:p-24" method='post'>
       <div className="flex items-center text-lg mb-6 md:mb-8">

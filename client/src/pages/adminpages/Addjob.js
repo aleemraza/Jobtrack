@@ -19,8 +19,22 @@ const Addjob = () => {
     setaddJob({...addJob , [e.target.name]: e.target.value})
   }
 
+  const isFormValid = () => {
+    const {company, position,status,jobType,jobLocation} = addJob;
+    if ( !company || !position ||!status ||!jobType ||!jobLocation) {
+      return false;
+    }
+    return true;
+  };
+
   const Submit_AddJob = async(e)=>{
     e.preventDefault()
+    if (!isFormValid()) {
+      toast.error("All fields are required", {
+        position: 'top-center',
+      });
+      return;
+    }
     const res = await addJobAPI(addJob);
     if(res.success){
       setTimeout(()=>{

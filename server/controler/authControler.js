@@ -152,7 +152,6 @@ exports.protect = async(req, res, next)=>{
 exports.getCurrentUser = async (req, res) => {
     try {
         const currentUser = await User.findOne({ _id: req.user.id });
-        console.log(currentUser);
         if (currentUser) {
             res.status(200).json({
                 status: "success",

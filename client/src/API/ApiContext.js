@@ -295,12 +295,51 @@ export const ApiProvider = ({ children })=>{
         }
     }
 
-    const updateUser = async()=>{
+    const updateUser = async(updateValue,Profile)=>{
+        try{
+            const {name,lastname,email,location} = updateValue;
+            const {avatar} = Profile;
+            const formData = new FormData();
+            formData.append('name', name);
+            formData.append('lastname', lastname);
+            formData.append('email', email);
+            formData.append('location', location);
+            if (avatar) {
+              formData.append('avatar', avatar);
+            }
         
+            const res = await fetch('http://127.0.0.1:8080/api/v1/user/updateUser',{
+                method:"PATCH",
+                headers:{
+                    'Authorization': `Bearer ${token}`,
+                    //'Content-Type': 'application/json'
+                },
+                body: formData
+                // JSON.stringify({
+                //     name:name,
+                //     lastname:lastname,
+                //     email:email,
+                //     location:location,
+                //     avatar:avatar
+                // })
+            });
+            console.log(res)
+            if(res.ok) {
+                const res_data = await res.json();
+                return { success: true, message: "User updated successfully", data: res_data };
+            } else {
+                console.error("Error updating user");
+                return { success: false, message: "Failed to update user" };
+            }
+        }catch(error){
+            console.error("Error", error);
+            return { success: false, error: error.message || "An error occurred" };
+
+        }
     }
     return (
         <ApiContext.Provider value={{isAuthenticated,RegisterApi,LoginApi, LogoutAPI, addJobAPI, 
-        getAllJobsAPI, deleteJobAPI , editJobAPI , getOneJobAPI ,StateJobAPI, CurrentUser}}>
+        getAllJobsAPI, deleteJobAPI , editJobAPI , getOneJobAPI ,StateJobAPI, CurrentUser,updateUser}}>
             {children}
         </ApiContext.Provider>
     )

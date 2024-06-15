@@ -6,7 +6,7 @@ const Home = () => {
   return (  
 <Layouts> 
 <section className="text-gray-600 body-font">
-  <div className="container h-full min-h-screen w-full mx-auto flex px-5 py-24 md:flex-row flex-col items-center">
+  <div className="container h-full  min-h-screen w-full mx-auto flex px-5  md:flex-row flex-col items-center">
     <div className="lg:flex-grow md:w-1/2 lg:pr-24 md:pr-16 flex flex-col md:items-start md:text-left mb-16 md:mb-0 items-center text-center">
       <h1 className="mb-4 text-3xl font-extrabold text-gray-900 dark:text-white md:text-5xl lg:text-6xl tracking-wider">Job
 

@@ -2,13 +2,16 @@ const multer = require('multer')
 const DataParser = require('datauri/parser')
 const path  = require('path')
 
-const storage = multer.memoryStorage()
-const upload = multer({storage})
-const parser = new DataParser();
+//upload image to database
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+          return cb(null, './profile')
+    },
+    filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now()
+     return cb(null, uniqueSuffix + file.originalname)
+    }
+})
+const upload = multer({ storage: storage });
 
-exports.formatImage = (file) => {
-    const fileExtension = path.extname(file.originalname).toString();
-    return parser.format(fileExtension, file.buffer).content;
-};
-
-module.exports = upload;
+module.exports = upload ;
